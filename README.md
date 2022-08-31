@@ -6,3 +6,4 @@ This project shares the Conky code I'm using for my computer's performance stats
 
 The shared file is normally found on Linux at ~/.config/conky/conky.conf.
 
+![Screenshot](images/conky-screenshot.jpg)
