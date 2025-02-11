@@ -18,3 +18,6 @@ So working with the zramctl command, I found it has a number of useful options t
 Again this includes the qualifying suffix, and at differing powers, so we cannot use these outputs to calculate anything useful like a percentage, but for now, the display will at least be tidy, and will make sense.
 
 I've not included a test condition so if you do not use Zram, then you can just comment out that line.
+
+# Changes for Nvidia
+For some reason the built-in Conky nvidia commands seemed to stop working in 2024. I've switch so long to using the nvidia-smi command instead. Whilst the values display fine, I've not yet found a way to replicate the Nvidia Bar function which used to show a % progress bar for GPU utilisation. This is not ideal but I'm open to ideas. For now at least it all works fine apart from the GPU bars.
