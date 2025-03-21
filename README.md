@@ -21,3 +21,13 @@ I've not included a test condition so if you do not use Zram, then you can just 
 
 # Changes for Nvidia
 For some reason the built-in Conky nvidia commands seemed to stop working in 2024. I've switch so long to using the nvidia-smi command instead. Whilst the values display fine, I've not yet found a way to replicate the Nvidia Bar function which used to show a % progress bar for GPU utilisation. This is not ideal but I'm open to ideas. For now at least it all works fine apart from the GPU bars.
+
+# Changes for NVMe drive
+I bought a NVMe drive and these can run hot. So I added a section that will run nvme-cli to return the temperate as a numeric value. This will show red if the temp is at 70 C or above, or green if below 70 C.
+
+Note that nvme-cli needs sudo to run, so to get the command running inside Conky without needing the password, you need to allow the command to run without a passwords. To do this:
+1. Execute 'sudo visudo' or if you have nano run 'sudo EDITOR=nano visudo'
+2. At the bottom of that file add a line 'your_user ALL=(ALL) NOPASSWD: /usr/sbin/nvme' where your_user is your login name.
+
+# Network stats not showing
+I noticed my network stats went blank, and it was because the network interface name had changed. You can verify inside the directory /sys/class/net/ what the network interface name is. It may show as enp4s0 or enp5s0, but the lines in the Conky config file need to all referenc ethe correct interface name.
