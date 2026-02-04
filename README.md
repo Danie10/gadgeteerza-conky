@@ -31,3 +31,6 @@ Note that nvme-cli needs sudo to run, so to get the command running inside Conky
 
 # Network stats not showing
 I noticed my network stats went blank, and it was because the network interface name had changed. You can verify inside the directory /sys/class/net/ what the network interface name is. It may show as enp4s0 or enp5s0, but the lines in the Conky config file need to all referenc ethe correct interface name.
+
+# Massive rewrite on 4 Feb 2026
+Netdata highlighted the massive inefficiencies in my Conky config (really bad and wearing my drive out). I used Google Gemini to rewrite most of the core of my config to use memory cache where possible, cut down on repeated queries, and to spread out the queries better. Everything was firing instantly every 3 seconds on the old config. Now some queries are every 10 seconds, some are every minute or 5 minutes. Resource usage should now be a good 70% less.
