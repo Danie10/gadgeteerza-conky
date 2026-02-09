@@ -13,6 +13,8 @@ The temp_alerts.lua file should go into ~/scripts. This script handles the coold
 
 If you see the HDD drive temps then permissions are fine for user to execute sudo commands. Otherwise you need to add your user to the sudoers group.
 
+To keep GPU stats in memory and lighten the polling I ran `sudo systemctl enable --now nvidia-persistenced` to make this persistent.
+
 
 # Zram usage display in Conky
 I added this line on 17 November 2022. The reason is that the normal swap variables in Conky are read from the '/proc/meminfo' file, but these swap stats appear to only show the uncompressed data used and do not agree at all with the output of the zramctl command.
