@@ -45,3 +45,6 @@ Netdata highlighted the massive inefficiencies in my Conky config (really bad an
 
 # Another rewrite on 5 Feb 2026
 This adds temperatures for two hard drives in addition to the NVMe drive. The big addition though is adding voice alerts if the temperatures go out of their green zones, using the espeak command. Note the Lua script is required to prevent voice alerts being continuously repeated on refresh.
+
+# Changes in Mar 2026
+I migrated to EndeavourOS and switched from using drive mounts at /run/media/user/1000 to /mnt so some paths were changed for this. I also added a line to show the Nvidia driver version as I get quicker updates now from Arch repos. The temp readings were optimised a bit, and fan config had to be fixed to work with the new OS.
