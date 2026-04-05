@@ -48,3 +48,8 @@ This adds temperatures for two hard drives in addition to the NVMe drive. The bi
 
 # Changes in Mar 2026
 I migrated to EndeavourOS and switched from using drive mounts at /run/media/user/1000 to /mnt so some paths were changed for this. I also added a line to show the Nvidia driver version as I get quicker updates now from Arch repos. The temp readings were optimised a bit, and fan config had to be fixed to work with the new OS.
+
+# Changes April 2026
+1. Removed the drive space checks for the Windows drives as they are not used and I am now no longer mounting them on boot. They get auto loaded if used, but the Conky pings were keeping them mounted the whole time.
+2. The temp check for the NVMe drive was not reading the correct variable so that was adjusted (the migration between Linux distros caused this change).
+3. Screenshot updated to reflect latest changes.
