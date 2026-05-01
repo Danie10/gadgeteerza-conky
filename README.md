@@ -9,12 +9,11 @@ This project shares the Conky code I'm using for my computer's performance stats
 # INSTALLATION
 The conky.conf file is normally found on Linux at ~/.config/conky/conky.conf.
 
-The temp_alerts.lua file should go into ~/scripts. This script handles the cooldown (so that it does not announce continuously) and the specific voice. Can run espeak-ng-v en+f2 "System alert. Drive temperature critical." from your terminal to see if espeak installed and hear what it would sound like.
+The temp_alerts.lua and the gpu_stats.sh files should go into ~/scripts (and both must be given executable permissions). The temp script handles the cooldown (so that it does not announce continuously) and the specific voice. Can run espeak-ng-v en+f2 "System alert. Drive temperature critical." from your terminal to see if espeak installed and hear what it would sound like. The gpu_stats file checks the GPU metrics once every 10 seconds only, and outputs it into a format that execpi cann display directly from inside conky.conf. Yes the VRAM Usage bar is different from the others, but the others were flickering on and off for the progress bar.
 
 If you see the HDD drive temps then permissions are fine for user to execute sudo commands. Otherwise you need to add your user to the sudoers group.
 
 To keep GPU stats in memory and lighten the polling I ran `sudo systemctl enable --now nvidia-persistenced` to make this persistent.
-
 
 # Zram usage display in Conky
 I added this line on 17 November 2022. The reason is that the normal swap variables in Conky are read from the '/proc/meminfo' file, but these swap stats appear to only show the uncompressed data used and do not agree at all with the output of the zramctl command.
@@ -53,3 +52,7 @@ I migrated to EndeavourOS and switched from using drive mounts at /run/media/use
 1. Removed the drive space checks for the Windows drives as they are not used and I am now no longer mounting them on boot. They get auto loaded if used, but the Conky pings were keeping them mounted the whole time.
 2. The temp check for the NVMe drive was not reading the correct variable so that was adjusted (the migration between Linux distros caused this change).
 3. Screenshot updated to reflect latest changes.
+
+# Changes on 1 May 2026
+1. Removed all the individual calls inside conky.conf that were checking GPU metrics and this lightens the resource calls ton the GPU dramatically. They are now called once in a new gpu_stats.sh file. The gpu_stats.sh file outputs a display format that execpi can merge inside conky.conf.
+2. Added the VRAM Usage metric to show how much VRAM is in use (I'm experimenting with local AI). As it renders from the gpu_stats file I noticed none of teh standard progress bars worked all the time (they sometimes showed 0% progress) so I went with a text based options that looks a bit different from the other bars.
