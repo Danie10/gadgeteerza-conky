@@ -56,3 +56,8 @@ I migrated to EndeavourOS and switched from using drive mounts at /run/media/use
 # Changes on 1 May 2026
 1. Removed all the individual calls inside conky.conf that were checking GPU metrics and this lightens the resource calls ton the GPU dramatically. They are now called once in a new gpu_stats.sh file. The gpu_stats.sh file outputs a display format that execpi can merge inside conky.conf.
 2. Added the VRAM Usage metric to show how much VRAM is in use (I'm experimenting with local AI). As it renders from the gpu_stats file I noticed none of teh standard progress bars worked all the time (they sometimes showed 0% progress) so I went with a text based options that looks a bit different from the other bars.
+
+# Changes 12 May 2026
+1. I ran out of free space on my boot drive today and it happened because ghost files were created when my backup drive should have been mounted. So I adapted the Conky config to now go red if boot drive is more than 90% used.
+2. The temp_alerts.lua file was also adapted to now cater for the drive space alert, as well as the temps it was previously monitoring.
+3. Screenshot updated.

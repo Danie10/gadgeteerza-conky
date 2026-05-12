@@ -1,5 +1,5 @@
 local last_alerts = {}
-local cooldown = 60 -- Seconds between voice alerts
+local cooldown = 300 -- Increased to 5 mins for disk space; it's less urgent than heat
 
 local function read_file(path)
     local f = io.open(path, "rb")
@@ -13,29 +13,41 @@ function conky_check_alert(device, tmp_file)
     local raw_content = read_file(tmp_file)
     if not raw_content or raw_content == "" then return "" end
 
-    -- Use string.match safely
-    local clean_temp = string.match(raw_content, "%d%d") 
-    local temp = tonumber(clean_temp)
+    local clean_val = string.match(raw_content, "%d+") 
+    local value = tonumber(clean_val)
     
-    -- Only print if we actually got a number to keep terminal clean
-    if temp then
-      --was for debugging  print("Corrected " .. device .. ": " .. tostring(temp))
-    else
-        return "" -- Exit quietly if file was temporarily unreadable
-    end
-
-    local threshold = 80 
-    if device == "GPU" then threshold = 75 end
-    if device:find("Drive") or device == "NVMe" then threshold = 60 end
+    if not value then return "" end
 
     local current_time = os.time()
+    local message = ""
+    local threshold = 80 -- Default
+
+    -- DISK SPACE LOGIC
+    if device:find("Full") then
+        threshold = 90
+        if value >= threshold then
+            if not last_alerts[device] or (current_time - last_alerts[device]) > cooldown then
+                message = "System alert. Storage " .. device:gsub("_Full", "") .. " is almost full. " .. value .. " percent used."
+                os.execute("espeak-ng -v en+f2 -s 140 '" .. message .. "' &")
+                last_alerts[device] = current_time
+            end
+        end
     
-    if temp >= threshold then
-        if not last_alerts[device] or (current_time - last_alerts[device]) > cooldown then
-            local message = "System alert. " .. device .. " temperature critical. " .. temp .. " degrees."
-            os.execute("espeak-ng -v en+f2 -s 140 '" .. message .. "' &")
-            last_alerts[device] = current_time
+    -- TEMPERATURE LOGIC (Original)
+    else
+        if value > 999 then value = math.floor(value / 1000) end
+        
+        if device == "GPU" then threshold = 80 end
+        if device:find("Drive") or device == "NVMe" then threshold = 70 end
+
+        if value >= threshold then
+            if not last_alerts[device] or (current_time - last_alerts[device]) > cooldown then
+                message = "System alert. " .. device .. " temperature critical. " .. value .. " degrees."
+                os.execute("espeak-ng -v en+f2 -s 140 '" .. message .. "' &")
+                last_alerts[device] = current_time
+            end
         end
     end
+
     return ""
 end
