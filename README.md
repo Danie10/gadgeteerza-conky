@@ -61,3 +61,6 @@ I migrated to EndeavourOS and switched from using drive mounts at /run/media/use
 1. I ran out of free space on my boot drive today and it happened because ghost files were created when my backup drive should have been mounted. So I adapted the Conky config to now go red if boot drive is more than 90% used.
 2. The temp_alerts.lua file was also adapted to now cater for the drive space alert, as well as the temps it was previously monitoring.
 3. Screenshot updated.
+
+# Changes 20 May 2026
+Conky update yesterday made the background opaqueness disappear. Did tweaks to get it back.
