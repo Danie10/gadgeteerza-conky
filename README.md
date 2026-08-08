@@ -9,7 +9,7 @@ This project shares the Conky code I'm using for my computer's performance stats
 # INSTALLATION
 The conky.conf file is normally found on Linux at ~/.config/conky/conky.conf.
 
-The temp_alerts.lua and the gpu_stats.sh files should go into ~/scripts (and both must be given executable permissions). The temp script handles the cooldown (so that it does not announce continuously) and the specific voice. Can run espeak-ng-v en+f2 "System alert. Drive temperature critical." from your terminal to see if espeak installed and hear what it would sound like. The gpu_stats file checks the GPU metrics once every 10 seconds only, and outputs it into a format that execpi cann display directly from inside conky.conf. Yes the VRAM Usage bar is different from the others, but the others were flickering on and off for the progress bar.
+The temp_alerts.lua, sensor_stats.sh and the gpu_stats.sh files should go into ~/scripts (and al must be given executable permissions). The temp script handles the cooldown (so that it does not announce continuously) and the specific voice. Can run espeak-ng-v en+f2 "System alert. Drive temperature critical." from your terminal to see if espeak installed and hear what it would sound like. The gpu_stats file checks the GPU metrics once every 10 seconds only, and outputs it into a format that execpi cann display directly from inside conky.conf. Yes the VRAM Usage bar is different from the others, but the others were flickering on and off for the progress bar.
 
 If you see the HDD drive temps then permissions are fine for user to execute sudo commands. Otherwise you need to add your user to the sudoers group.
 
@@ -64,3 +64,6 @@ I migrated to EndeavourOS and switched from using drive mounts at /run/media/use
 
 # Changes 20 May 2026
 Conky update yesterday made the background opaqueness disappear. Did tweaks to get it back.
+
+# Changes 8 August 2026
+I consolidated 4 separate sensors calls (CPU temp, fan1, fan2, fan3 — previously at mixed 10s/15s intervals) into one sensors call every 10 seconds via a new sensor_stats.sh script (same pattern as gpu_stats.sh), caching output to /tmp/sensors_cache and writing each value to its own small file. Initially tried this as one long inline execi command directly in conky.conf, but that hit conky's default text_buffer_size (256 bytes) and got silently truncated, dropping the Rear Fan reading. Moving the logic into an external script keeps the conky.conf line short and avoids the buffer limit. This is about a 75% cut in hardware sensor polling.
