@@ -3,46 +3,57 @@
 # Define your total VRAM in MiB (12GB = 12288 MiB)
 TOTAL_VRAM=12288
 
-# Query metrics - using comma as the only delimiter for the query
-# Now running the "heavy" nvidia-smi tool exactly once per refresh cycle instead of 8 separate times
-OUTPUT=$(nvidia-smi --query-gpu=name,driver_version,memory.used,utilization.gpu,utilization.decoder,utilization.encoder,temperature.gpu,fan.speed --format=csv,noheader,nounits 2>/dev/null)
+# Query metrics - running the "heavy" nvidia-smi tool exactly once per refresh
+# cycle instead of 8 separate times.
+#
+# OPTIMISED: the previous version then split that single line by piping it
+# through 8 separate 'echo | awk' subshells plus 7 'sed' calls - about 30 forks
+# every 10 seconds (~260k processes a day) purely to split one CSV line.
+# Bash can do the whole split natively with one 'read', so this is now 2 forks.
+IFS=',' read -r NAME DRIVER VRAM_RAW GPU DEC ENC TEMP FAN < <(
+    nvidia-smi --query-gpu=name,driver_version,memory.used,utilization.gpu,utilization.decoder,utilization.encoder,temperature.gpu,fan.speed \
+        --format=csv,noheader,nounits 2>/dev/null
+)
 
-if [[ -z "$OUTPUT" ]]; then
+if [[ -z "$NAME" ]]; then
     echo "GPU Error or Not Found"
     exit 1
 fi
 
-# Use awk to split by comma specifically, preserving spaces within the GPU name
-NAME=$(echo "$OUTPUT" | awk -F', ' '{print $1}')
-DRIVER=$(echo "$OUTPUT" | awk -F', ' '{print $2}')
-VRAM_RAW=$(echo "$OUTPUT" | awk -F', ' '{print $3}' | sed 's/\[N\/A\]/0/')
-GPU=$(echo "$OUTPUT" | awk -F', ' '{print $4}' | sed 's/\[N\/A\]/0/')
-DEC=$(echo "$OUTPUT" | awk -F', ' '{print $5}' | sed 's/\[N\/A\]/0/')
-ENC=$(echo "$OUTPUT" | awk -F', ' '{print $6}' | sed 's/\[N\/A\]/0/')
-TEMP=$(echo "$OUTPUT" | awk -F', ' '{print $7}' | sed 's/\[N\/A\]/0/')
-FAN=$(echo "$OUTPUT" | awk -F', ' '{print $8}' | sed 's/\[N\/A\]/0/')
+# Trim leading/greedy whitespace left by the CSV separator, and normalise the
+# [N/A] values nvidia-smi emits for unsupported metrics. Pure bash, no sed forks.
+for v in NAME DRIVER VRAM_RAW GPU DEC ENC TEMP FAN; do
+    val="${!v}"
+    val="${val#"${val%%[![:space:]]*}"}"   # strip leading whitespace
+    val="${val%"${val##*[![:space:]]}"}"   # strip trailing whitespace
+    [[ "$val" == "[N/A]" ]] && val=0
+    printf -v "$v" '%s' "$val"
+done
+
+# Guard against non-numeric values so the arithmetic below can't error out
+[[ "$VRAM_RAW" =~ ^[0-9]+$ ]] || VRAM_RAW=0
+[[ "$TEMP"     =~ ^[0-9]+$ ]] || TEMP=0
 
 # Calculate VRAM percentage: (Used / Total) * 100
 VRAM_PERC=$(( VRAM_RAW * 100 / TOTAL_VRAM ))
 
-# Save temp to file for your Lua alert script to read
+# Save temp to file for the Lua alert script to read
 echo "$TEMP" > /tmp/gpu_temp
 
 # Determine temperature color logic for Conky
-if [ "$TEMP" -ge 75 ]; then TCOLOR="\${color red}"; else TCOLOR="\${color green}"; fi
+if [ "$TEMP" -ge 80 ]; then TCOLOR="\${color red}"; else TCOLOR="\${color green}"; fi
 
-
-# Define VRAM Usage bar based on the calculated percentage
+# Define VRAM Usage bar based on the calculated percentage.
+# Built with bash printf padding instead of the old $(seq ...) subshells.
 BAR_MAX=23
 NUM_BLOCKS=$(( VRAM_PERC * BAR_MAX / 100 ))
+(( NUM_BLOCKS < 0 )) && NUM_BLOCKS=0
+(( NUM_BLOCKS > BAR_MAX )) && NUM_BLOCKS=$BAR_MAX
 NUM_EMPTY=$(( BAR_MAX - NUM_BLOCKS ))
 
-# Prevent errors if blocks are 0
-[[ $NUM_BLOCKS -le 0 ]] && NUM_BLOCKS=0
-[[ $NUM_EMPTY -le 0 ]] && NUM_EMPTY=0
-
-FILL_STR=$(printf '█%.0s' $(seq 1 $NUM_BLOCKS 2>/dev/null))
-EMPTY_STR=$(printf '█%.0s' $(seq 1 $NUM_EMPTY 2>/dev/null))
+FULL_BAR='███████████████████████'   # 23 blocks
+FILL_STR="${FULL_BAR:0:NUM_BLOCKS}"
+EMPTY_STR="${FULL_BAR:0:NUM_EMPTY}"
 BAR_STR="\${color white}${FILL_STR}\${color #333333}${EMPTY_STR}\$color"
 
 # Output the RAW Conky code for display by execpi in conky.conf
