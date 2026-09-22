@@ -70,3 +70,8 @@ I consolidated 4 separate sensors calls (CPU temp, fan1, fan2, fan3 — previous
 
 # Changes 5 September 2026
 I fixed conky's window pinning to monitor 3, which had drifted after rotating monitor 1 to portrait — the real cause was a stale absolute-position KWin rule, not conky.conf itself. Fixed two silent bugs: NVMe temp was actually reading a hard drive's hwmon node (wrong threshold applied), and the root-disk "almost full" alert had never fired due to an invalid execi. Migrated window transparency to conky's current own_window_colour setting. Optimised gpu_stats.sh and sensor_stats.sh to cut subprocess forks (59→6 and 19→7 per run) and dropped two sudo smartctl polls in favour of free hwmon sysfs reads.
+
+# Changes 22 September 2026
+1. Label text was hard to read against the background, so the label colours are now defined once in conky.config as color1 (#D8D8D8, labels, was X11 grey #BEBEBE) and color2 (#E8E8E8, top-process rows, was lightgrey #D3D3D3). Every hardcoded grey/lightgrey in conky.conf and gpu_stats.sh now uses these, so brightness can be tuned in one place.
+2. Top Processes header re-spaced so the Name / PID / CPU% / MEM% titles line up better with the columns below.
+3. Screenshot updated.

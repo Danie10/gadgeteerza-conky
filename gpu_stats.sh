@@ -59,11 +59,11 @@ BAR_STR="\${color white}${FILL_STR}\${color #333333}${EMPTY_STR}\$color"
 # Output the RAW Conky code for display by execpi in conky.conf
 cat <<EOF
 \${font Good Times:size=12}\${color Tan1}GPU \$alignr \${font}\$color $NAME
-\${color grey}Driver:\$color \$alignr $DRIVER
-\${color grey}VRAM Usage:\$color $VRAM_PERC% $BAR_STR
-\${color grey}Temperature: $TCOLOR \$alignr $TEMP°C\${lua check_alert GPU /tmp/gpu_temp}
-\${color grey}Graphics Usage: \$color \$alignr $GPU%
-\${color grey}Video Decoder: \$color \$alignr $DEC%
-\${color grey}Video Encoder: \$color \$alignr $ENC%
-\${color grey}Fan speed: \$color \$alignr $FAN%
+\${color1}Driver:\$color \$alignr $DRIVER
+\${color1}VRAM Usage:\$color $VRAM_PERC% $BAR_STR
+\${color1}Temperature: $TCOLOR \$alignr $TEMP°C\${lua check_alert GPU /tmp/gpu_temp}
+\${color1}Graphics Usage: \$color \$alignr $GPU%
+\${color1}Video Decoder: \$color \$alignr $DEC%
+\${color1}Video Encoder: \$color \$alignr $ENC%
+\${color1}Fan speed: \$color \$alignr $FAN%
 EOF
