@@ -43,24 +43,14 @@ echo "$TEMP" > /tmp/gpu_temp
 # Determine temperature color logic for Conky
 if [ "$TEMP" -ge 80 ]; then TCOLOR="\${color red}"; else TCOLOR="\${color green}"; fi
 
-# Define VRAM Usage bar based on the calculated percentage.
-# Built with bash printf padding instead of the old $(seq ...) subshells.
-BAR_MAX=23
-NUM_BLOCKS=$(( VRAM_PERC * BAR_MAX / 100 ))
-(( NUM_BLOCKS < 0 )) && NUM_BLOCKS=0
-(( NUM_BLOCKS > BAR_MAX )) && NUM_BLOCKS=$BAR_MAX
-NUM_EMPTY=$(( BAR_MAX - NUM_BLOCKS ))
-
-FULL_BAR='███████████████████████'   # 23 blocks
-FILL_STR="${FULL_BAR:0:NUM_BLOCKS}"
-EMPTY_STR="${FULL_BAR:0:NUM_EMPTY}"
-BAR_STR="\${color white}${FILL_STR}\${color #333333}${EMPTY_STR}\$color"
+# VRAM bar: written to a file and drawn by conky's native execibar so it matches the other bars
+echo "$VRAM_PERC" > /tmp/gpu_vram_perc
 
 # Output the RAW Conky code for display by execpi in conky.conf
 cat <<EOF
 \${font Good Times:size=12}\${color Tan1}GPU \$alignr \${font}\$color $NAME
 \${color1}Driver:\$color \$alignr $DRIVER
-\${color1}VRAM Usage:\$color $VRAM_PERC% $BAR_STR
+\${color1}VRAM Usage:\$color $VRAM_PERC% \${execibar 10 cat /tmp/gpu_vram_perc}
 \${color1}Temperature: $TCOLOR \$alignr $TEMP°C\${lua check_alert GPU /tmp/gpu_temp}
 \${color1}Graphics Usage: \$color \$alignr $GPU%
 \${color1}Video Decoder: \$color \$alignr $DEC%

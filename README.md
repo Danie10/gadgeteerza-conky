@@ -75,3 +75,8 @@ I fixed conky's window pinning to monitor 3, which had drifted after rotating mo
 1. Label text was hard to read against the background, so the label colours are now defined once in conky.config as color1 (#D8D8D8, labels, was X11 grey #BEBEBE) and color2 (#E8E8E8, top-process rows, was lightgrey #D3D3D3). Every hardcoded grey/lightgrey in conky.conf and gpu_stats.sh now uses these, so brightness can be tuned in one place.
 2. Top Processes header re-spaced so the Name / PID / CPU% / MEM% titles line up better with the columns below.
 3. Screenshot updated.
+
+# Changes 9 October 2026
+1. The VRAM Usage bar now uses conky's native `execibar` (fed from `/tmp/gpu_vram_perc`, written by gpu_stats.sh) instead of the text-block bar, so it looks the same as the CPU, RAM and swap bars.
+2. Top Processes: removed the leading space so the Name column and header align left with the rest of the display; the PID, CPU% and MEM% columns stay where they were.
+3. Screenshot updated.
