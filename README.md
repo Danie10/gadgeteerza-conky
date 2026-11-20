@@ -85,4 +85,5 @@ I fixed conky's window pinning to monitor 3, which had drifted after rotating mo
 1. Drive changes on my system: the old Home hard drive was removed and /home now lives on a second NVMe drive (KLEVV), alongside the Samsung NVMe root drive. The 4TB WD backup hard drive stays.
 2. Drive Temps now shows Root NVMe, Home NVMe and Backup. sensor_stats.sh now matches drives by model name (Samsung*, KLEVV*, WDC WD40EZAZ*) instead of by sdX letter, because the letters shift whenever a drive is added or removed. If your drives differ, edit the model patterns in the case statements in sensor_stats.sh. The temps are written to /tmp/nvme_temp, /tmp/nvme_home_temp and /tmp/backup_temp.
 3. Conky 1.25 auto-selects the Wayland backend in a Wayland session (ignoring the deprecated out_to_x), and that backend crashes with this config. conky.conf now sets output_backend = 'x11' to force X11/Xwayland.
-4. Screenshot updated.
+4. Voice alerts now say "boot drive", "home data drive" and "backup drive" instead of the raw device labels (spoken names are set in the spoken_names table at the top of temp_alerts.lua). The backup drive voice alert now triggers at 65°C instead of 70°C.
+5. Screenshot updated.

@@ -1,5 +1,11 @@
 local last_alerts = {}
 local cooldown = 300 -- Increased to 5 mins for disk space; it's less urgent than heat
+-- What espeak says for each device (conky args can't contain spaces)
+local spoken_names = {
+    NVMe = "boot drive",
+    Drive_NVMe_Home = "home data drive",
+    Drive_SDC = "backup drive",
+}
 
 local function read_file(path)
     local f = io.open(path, "rb")
@@ -39,10 +45,11 @@ function conky_check_alert(device, tmp_file)
         
         if device == "GPU" then threshold = 80 end
         if device:find("Drive") or device == "NVMe" then threshold = 70 end
+        if device == "Drive_SDC" then threshold = 65 end -- Backup HDD
 
         if value >= threshold then
             if not last_alerts[device] or (current_time - last_alerts[device]) > cooldown then
-                message = "System alert. " .. device .. " temperature critical. " .. value .. " degrees."
+                message = "System alert. " .. (spoken_names[device] or device) .. " temperature critical. " .. value .. " degrees."
                 os.execute("espeak-ng -v en+f2 -s 140 '" .. message .. "' &")
                 last_alerts[device] = current_time
             end
