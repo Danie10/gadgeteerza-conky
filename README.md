@@ -80,3 +80,9 @@ I fixed conky's window pinning to monitor 3, which had drifted after rotating mo
 1. The VRAM Usage bar now uses conky's native `execibar` (fed from `/tmp/gpu_vram_perc`, written by gpu_stats.sh) instead of the text-block bar, so it looks the same as the CPU, RAM and swap bars.
 2. Top Processes: removed the leading space so the Name column and header align left with the rest of the display; the PID, CPU% and MEM% columns stay where they were.
 3. Screenshot updated.
+
+# Changes 20 November 2026
+1. Drive changes on my system: the old Home hard drive was removed and /home now lives on a second NVMe drive (KLEVV), alongside the Samsung NVMe root drive. The 4TB WD backup hard drive stays.
+2. Drive Temps now shows Root NVMe, Home NVMe and Backup. sensor_stats.sh now matches drives by model name (Samsung*, KLEVV*, WDC WD40EZAZ*) instead of by sdX letter, because the letters shift whenever a drive is added or removed. If your drives differ, edit the model patterns in the case statements in sensor_stats.sh. The temps are written to /tmp/nvme_temp, /tmp/nvme_home_temp and /tmp/backup_temp.
+3. Conky 1.25 auto-selects the Wayland backend in a Wayland session (ignoring the deprecated out_to_x), and that backend crashes with this config. conky.conf now sets output_backend = 'x11' to force X11/Xwayland.
+4. Screenshot updated.

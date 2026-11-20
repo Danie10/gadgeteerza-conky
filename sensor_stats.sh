@@ -43,17 +43,23 @@ for h in /sys/class/hwmon/hwmon*; do
             for b in "$h"/device/block/*; do
                 [[ -e "$b" ]] && { blk="${b##*/}"; break; }
             done
-            [[ -n "$blk" && -r "$h/temp1_input" ]] || continue
+            # Match by drive model, not sdX letter: letters shift when drives
+            # are added/removed (they did on 2026-11-20 when old home was pulled).
+            [[ -n "$blk" && -r "$h/temp1_input" && -r "$h/device/model" ]] || continue
+            read -r model < "$h/device/model"
             read -r mt < "$h/temp1_input"
-            case "$blk" in
-                sda) echo "$(( mt / 1000 ))" > /tmp/sda_temp ;;
-                sdc) echo "$(( mt / 1000 ))" > /tmp/sdc_temp ;;
+            case "$model" in
+                WDC\ WD40EZAZ*) echo "$(( mt / 1000 ))" > /tmp/backup_temp ;;
             esac
             ;;
         nvme)
-            [[ -r "$h/temp1_input" ]] || continue
+            [[ -r "$h/temp1_input" && -r "$h/device/model" ]] || continue
+            read -r model < "$h/device/model"
             read -r mt < "$h/temp1_input"
-            echo "$(( mt / 1000 ))" > /tmp/nvme_temp
+            case "$model" in
+                Samsung*) echo "$(( mt / 1000 ))" > /tmp/nvme_temp ;;
+                KLEVV*)   echo "$(( mt / 1000 ))" > /tmp/nvme_home_temp ;;
+            esac
             ;;
     esac
 done
