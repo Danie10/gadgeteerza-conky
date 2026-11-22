@@ -87,3 +87,6 @@ I fixed conky's window pinning to monitor 3, which had drifted after rotating mo
 3. Conky 1.25 auto-selects the Wayland backend in a Wayland session (ignoring the deprecated out_to_x), and that backend crashes with this config. conky.conf now sets output_backend = 'x11' to force X11/Xwayland.
 4. Voice alerts now say "boot drive", "home data drive" and "backup drive" instead of the raw device labels (spoken names are set in the spoken_names table at the top of temp_alerts.lua). The backup drive voice alert now triggers at 65°C instead of 70°C.
 5. Screenshot updated.
+
+# Changes 22 November 2026
+1. GPU temperature was showing 0°C after updating to Nvidia driver 620.73. This driver now reports the temperature with decimals (e.g. 46.91), which gpu_stats.sh treated as invalid and replaced with 0. That also meant the GPU voice alert could never fire. gpu_stats.sh now drops the decimals and shows whole degrees.

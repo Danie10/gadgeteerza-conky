@@ -30,6 +30,9 @@ for v in NAME DRIVER VRAM_RAW GPU DEC ENC TEMP FAN; do
     printf -v "$v" '%s' "$val"
 done
 
+# Driver 620+ reports temperature with decimals (e.g. 46.91); keep whole degrees
+TEMP="${TEMP%%.*}"
+
 # Guard against non-numeric values so the arithmetic below can't error out
 [[ "$VRAM_RAW" =~ ^[0-9]+$ ]] || VRAM_RAW=0
 [[ "$TEMP"     =~ ^[0-9]+$ ]] || TEMP=0
